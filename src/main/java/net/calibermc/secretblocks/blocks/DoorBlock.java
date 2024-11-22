@@ -4,10 +4,7 @@ import net.calibermc.secretblocks.SecretBlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockSetType;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,7 +36,8 @@ public class DoorBlock extends net.minecraft.block.DoorBlock implements BlockEnt
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.getBlockEntity(pos) instanceof SecretBlockEntity secretBlockEntity) {
-			SecretBlocks.hitSet(world, pos, pos.down(), false, Direction.DOWN, Direction.DOWN, secretBlockEntity);
+			if (secretBlockEntity.getState(Direction.DOWN).getBlock() == Blocks.AIR)
+				SecretBlocks.hitSet(world, pos, pos.down(), false, Direction.DOWN, Direction.DOWN, secretBlockEntity);
 		}
 		return super.onUse(state, world, pos, player, hand, hit);
 	}
