@@ -20,10 +20,10 @@ public class ModItems {
 
     // Items
     public static final Item SECRET_GOGGLES = registerItem("secret_goggles",
-            new Item( new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+            new Item( new Item.Settings().rarity(Rarity.UNCOMMON)));
 
     public static final Item SWITCH_PROBE = registerItem("switch_probe",
-            new SwitchProbe( new FabricItemSettings().rarity(Rarity.RARE).maxCount(1)));
+            new SwitchProbe( new Item.Settings().rarity(Rarity.RARE).maxCount(1)));
 
     public static final Item SWITCH_PROBE_ROTATION_MODE = registerItem("switch_probe_rotation_mode",
             new SwitchProbe( new Item.Settings().rarity(Rarity.RARE).maxCount(1)));

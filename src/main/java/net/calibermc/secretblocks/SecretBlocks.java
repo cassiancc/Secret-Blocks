@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -63,55 +64,77 @@ public class SecretBlocks implements ModInitializer {
 			World world = player.getWorld();
 			Direction facing = player.getHorizontalFacing().getOpposite();
 			server.execute(() -> {
+				System.out.println(world.getBlockState(hit.getBlockPos().up()).getBlock());
 				if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
-
 					if (hit.getType() != HitResult.Type.MISS) {
-
-						BlockPos blockPos = hit.getBlockPos();
-						BlockState blockState = world.getBlockState(blockPos);
-						Block block = blockState.getBlock();
-
-						if (block instanceof SecretBlock) {
-							if (world.getBlockEntity(blockPos) instanceof SecretBlockEntity blockEntityAdjacent) {
-                                for (Direction dir : Direction.values()) {
-									if (glass) {
-										SecretBlocks.updateSide(facing != dir ? blockEntityAdjacent.getState(hit.getSide()) : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-									} else {
-										SecretBlocks.updateSide(blockEntityAdjacent.getState(hit.getSide()), dir, pos, blockEntity);
-									}
-								}
-							} else {
-								for (Direction dir : Direction.values()) {
-									if (glass) {
-										SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-									} else {
-										SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
-									}
-								}
-							}
-						} else if (block != Blocks.AIR && blockState.isFullCube(world, blockPos)) {
-							for (Direction dir : Direction.values()) {
-								if (glass) {
-									SecretBlocks.updateSide(facing != dir ? blockState : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-								} else {
-									SecretBlocks.updateSide(blockState, dir, pos, blockEntity);
-								}
-							}
-						} else {
-							for (Direction dir : Direction.values()) {
-								if (glass) {
-									SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-								} else {
-									SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
-								}
-							}
-						}
+						hitSet(world, pos, hit.getBlockPos(), glass, facing, hit.getSide());
 					}
-
-					blockEntity.refresh();
 				}
 			});
 		});
+	}
+
+	public static void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, boolean updateTopHalf) {
+		if (world.isClient) {
+//			MinecraftClient client = MinecraftClient.getInstance();
+//			SecretBlocksClient.sendHitSetter(pos, (BlockHitResult) client.crosshairTarget, false);
+//			if (updateTopHalf)
+//				SecretBlocksClient.sendHitSetter(pos.up(), (BlockHitResult) client.crosshairTarget, false);
+		}
+		else {
+			if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
+				SecretBlocks.hitSet(world, pos, pos.down(), false, Direction.DOWN, Direction.DOWN);
+				if (updateTopHalf) {
+					SecretBlocks.hitSet(world, pos.up(), pos.down(), false, Direction.DOWN, Direction.DOWN);
+				}
+			}
+		}
+	}
+
+	public static void hitSet(World world, BlockPos pos, BlockPos hitPos, boolean glass, Direction facing, Direction side) {
+		System.out.println(pos.toString() + (world.getBlockEntity(pos) instanceof SecretBlockEntity));
+		if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
+            BlockState blockState = world.getBlockState(hitPos);
+            Block block = blockState.getBlock();
+
+            if (block instanceof SecretBlock) {
+                if (world.getBlockEntity(hitPos) instanceof SecretBlockEntity blockEntityAdjacent) {
+                    for (Direction dir : Direction.values()) {
+                        if (glass) {
+                            SecretBlocks.updateSide(facing != dir ? blockEntityAdjacent.getState(side) : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                        } else {
+                            SecretBlocks.updateSide(blockEntityAdjacent.getState(side), dir, pos, blockEntity);
+                        }
+                    }
+                } else {
+                    for (Direction dir : Direction.values()) {
+                        if (glass) {
+                            SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                        } else {
+                            SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
+                        }
+                    }
+                }
+            } else if (block != Blocks.AIR && blockState.isFullCube(world, hitPos)) {
+                for (Direction dir : Direction.values()) {
+                    if (glass) {
+                        SecretBlocks.updateSide(facing != dir ? blockState : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                    } else {
+                        SecretBlocks.updateSide(blockState, dir, pos, blockEntity);
+                    }
+                }
+            } else {
+                for (Direction dir : Direction.values()) {
+                    if (glass) {
+                        SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                    } else {
+                        SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
+                    }
+                }
+            }
+
+            blockEntity.refresh();
+		}
 	}
 
 	public static void updateSide(BlockState state, Direction dir, BlockPos pos, SecretBlockEntity entity) {
