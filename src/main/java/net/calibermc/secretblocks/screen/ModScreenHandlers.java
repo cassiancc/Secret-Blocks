@@ -1,7 +1,6 @@
 package net.calibermc.secretblocks.screen;
 
 import net.calibermc.secretblocks.SecretBlocks;
-import net.calibermc.secretblocks.screen.SecretChestScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;

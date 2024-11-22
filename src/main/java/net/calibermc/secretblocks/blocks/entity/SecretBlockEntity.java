@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -29,6 +30,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
@@ -42,6 +46,8 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
+
+import static net.calibermc.secretblocks.SecretBlocks.LOOKUP;
 
 public class SecretBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, BlockEntityTicker<SecretBlockEntity> {
 
@@ -116,7 +122,7 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 		deserialize(tag);
 		Inventories.readNbt(tag, this.inventory);
 		if (this.getWorld() != null && this.getWorld().isClient()) {
-			world.updateListeners(pos, null, null, 0);
+			this.getWorld().updateListeners(pos, null, null, 0);
 		}
 	}
 
@@ -153,6 +159,7 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public void deserialize(NbtCompound tag) {
+        RegistryWrapper.Impl<Block> lookup = LOOKUP;
 
 		// Age
 		if (tag.contains("age")) {
@@ -161,22 +168,22 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 
 		// States
 		if (tag.contains("upState")) {
-			this.upState = NbtHelper.toBlockState(tag.getCompound("upState"));
+			this.upState = NbtHelper.toBlockState(lookup, tag.getCompound("upState"));
 		}
 		if (tag.contains("downState")) {
-			this.downState = NbtHelper.toBlockState(tag.getCompound("downState"));
+			this.downState = NbtHelper.toBlockState(lookup, tag.getCompound("downState"));
 		}
 		if (tag.contains("northState")) {
-			this.northState = NbtHelper.toBlockState(tag.getCompound("northState"));
+			this.northState = NbtHelper.toBlockState(lookup, tag.getCompound("northState"));
 		}
 		if (tag.contains("eastState")) {
-			this.eastState = NbtHelper.toBlockState(tag.getCompound("eastState"));
+			this.eastState = NbtHelper.toBlockState(lookup, tag.getCompound("eastState"));
 		}
 		if (tag.contains("southState")) {
-			this.southState = NbtHelper.toBlockState(tag.getCompound("southState"));
+			this.southState = NbtHelper.toBlockState(lookup, tag.getCompound("southState"));
 		}
 		if (tag.contains("westState")) {
-			this.westState = NbtHelper.toBlockState(tag.getCompound("westState"));
+			this.westState = NbtHelper.toBlockState(lookup, tag.getCompound("westState"));
 		}
 
 		// Direction
@@ -319,37 +326,38 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public static BlockState getState(Direction dir, NbtCompound tag) {
+		var lookup = LOOKUP;
 		BlockState tempState = Blocks.STONE.getDefaultState();
 		switch (dir) {
 			case DOWN:
 				if (tag.contains("downState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("downState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("downState"));
 				}
 				break;
 			case NORTH:
 				if (tag.contains("northState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("northState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("northState"));
 				}
 				break;
 			case EAST:
 				if (tag.contains("eastState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("eastState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("eastState"));
 				}
 				break;
 			case SOUTH:
 				if (tag.contains("southState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("southState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("southState"));
 				}
 				break;
 			case WEST:
 				if (tag.contains("westState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("westState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("westState"));
 				}
 				break;
 			case UP:
 			default:
 				if (tag.contains("upState")) {
-					tempState = NbtHelper.toBlockState(tag.getCompound("upState"));
+					tempState = NbtHelper.toBlockState(lookup, tag.getCompound("upState"));
 				}
 				break;
 		}
@@ -521,7 +529,7 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 			int tempRotation = 0;
 
 			if (tag.contains(direction.name().toLowerCase() + "State")) {
-				tempState = NbtHelper.toBlockState(tag.getCompound(direction.name().toLowerCase() + "State"));
+				tempState = NbtHelper.toBlockState(LOOKUP, tag.getCompound(direction.name().toLowerCase() + "State"));
 			}
 
 			if (tag.contains(direction.name().toLowerCase() + "Direction")) {
@@ -679,7 +687,7 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 
 	private void renderDoor(QuadEmitter emitter, BlockState state, Direction direction) {
 
-		Direction renderDirection = Direction.EAST;
+		Direction renderDirection;
 
 		if ((state.get(DoorBlock.FACING) == Direction.NORTH && !state.get(DoorBlock.OPEN)) || (state.get(DoorBlock.FACING) == Direction.EAST && state.get(DoorBlock.HINGE) == DoorHinge.RIGHT && state.get(DoorBlock.OPEN)) || (state.get(DoorBlock.FACING) == Direction.WEST && state.get(DoorBlock.HINGE) == DoorHinge.LEFT && state.get(DoorBlock.OPEN))) {
 			renderDirection = Direction.SOUTH;

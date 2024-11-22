@@ -7,11 +7,12 @@ import net.calibermc.secretblocks.screen.SecretChestScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
+import net.calibermc.secretblocks.render.SecretBlockResourceProvider;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
-import net.calibermc.secretblocks.render.SecretBlockResourceProvider;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
@@ -22,6 +23,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import static net.calibermc.secretblocks.SecretBlocks.LOOKUP;
 
 
 @Environment(EnvType.CLIENT)
@@ -33,14 +35,14 @@ public class SecretBlocksClient implements ClientModInitializer {
 
 		HandledScreens.register(ModScreenHandlers.SECRET_CHEST_SCREEN_HANDLER, SecretChestScreen::new);  //Screen handler
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new SecretBlockResourceProvider());
-		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), ModBlocks.secretBlocksList);
+		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), ModBlocks.BLOCKS.toArray(Block[]::new));
 //		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), SecretBlocks.glassBlocksList);
 
 		ClientPlayNetworking.registerGlobalReceiver(SecretBlocks.id("update_side"), (client, handler, buf, responseSender) -> {
 			NbtCompound tag = buf.readNbt();
 			Direction dir = buf.readEnumConstant(Direction.class);
 			BlockPos pos = buf.readBlockPos();
-			BlockState state = NbtHelper.toBlockState(tag.getCompound("state"));
+			BlockState state = NbtHelper.toBlockState(LOOKUP, tag.getCompound("state"));
 			client.execute(() -> {
 				SecretBlockEntity secretBlockEntity = ((SecretBlockEntity) client.world.getBlockEntity(pos));
 				if (secretBlockEntity != null) {

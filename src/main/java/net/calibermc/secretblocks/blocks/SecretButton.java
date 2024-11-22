@@ -1,14 +1,10 @@
 package net.calibermc.secretblocks.blocks;
 
-import net.calibermc.secretblocks.SecretBlocks;
 import net.calibermc.secretblocks.SecretBlocksClient;
 import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
@@ -24,11 +20,13 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class StoneButton extends net.minecraft.block.StoneButtonBlock implements BlockEntityProvider, SecretBlock {
+public class SecretButton extends ButtonBlock implements BlockEntityProvider, SecretBlock {
 
-    public StoneButton(Settings settings) {
-        super(settings);
+    public SecretButton(AbstractBlock.Settings settings, BlockSetType blockSetType, boolean wooden) {
+        super(settings, blockSetType, 40, wooden);
     }
+
+//    private static final VoxelShape SHAPE = VoxelShapes.cuboid(0.0d, 0.0d, 0.0d, 1.0d, 1.0d, 1.0d);
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
@@ -69,5 +67,10 @@ public class StoneButton extends net.minecraft.block.StoneButtonBlock implements
         return VoxelShapes.fullCube();
 
     }
+
+//    @Override
+//    public VoxelShape getOutlineShape(BlockState state, BlockView blockView, BlockPos pos, ShapeContext context) {
+//        return SHAPE;
+//    }
 }
 

@@ -13,12 +13,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import static net.calibermc.secretblocks.SecretBlocks.LOOKUP;
 
 public class SwitchProbe extends Item {
 
@@ -37,10 +43,7 @@ public class SwitchProbe extends Item {
 		Direction dir = context.getSide();
 
 		if (block instanceof SecretBlock) {
-			if (world.getBlockEntity(blockPos) instanceof SecretBlockEntity) {
-
-				SecretBlockEntity secretBlockEntity = (SecretBlockEntity) world.getBlockEntity(blockPos);
-
+			if (world.getBlockEntity(blockPos) instanceof SecretBlockEntity secretBlockEntity) {
 				if (itemStack.getItem() == ModItems.SWITCH_PROBE) {
 					if (itemStack.hasNbt()) {
 						SecretBlocks.updateSide(getState(itemStack), dir, blockPos, secretBlockEntity);
@@ -81,16 +84,12 @@ public class SwitchProbe extends Item {
 	}
 
 	private static BlockState getState(ItemStack itemStack) {
-		return NbtHelper.toBlockState(itemStack.getOrCreateSubNbt("setState"));
+		return NbtHelper.toBlockState(LOOKUP, itemStack.getOrCreateSubNbt("setState"));
 	}
 
 	private static Direction getDirection(ItemStack itemStack) {
 		NbtCompound tag = itemStack.getOrCreateNbt();
-		Direction tempDir = Direction.NORTH;
-
-		tempDir = SecretBlockEntity.byName(tag.getString("setDirection"));
-
-		return tempDir;
+		return SecretBlockEntity.byName(tag.getString("setDirection"));
 	}
 
 }

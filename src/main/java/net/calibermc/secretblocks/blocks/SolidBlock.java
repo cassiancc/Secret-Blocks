@@ -39,6 +39,7 @@ public class SolidBlock extends Block implements BlockEntityProvider, SecretBloc
 			SecretBlocksClient.sendHitSetter(pos, (BlockHitResult) client.crosshairTarget, false);
 		}
 		super.onPlaced(world, pos, state, placer, itemStack);
+
 	}
 
 	@Override

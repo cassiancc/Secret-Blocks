@@ -5,10 +5,7 @@ import net.calibermc.secretblocks.SecretBlocksClient;
 import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -27,8 +24,8 @@ import net.minecraft.world.World;
 
 public class PressurePlate extends net.minecraft.block.PressurePlateBlock implements BlockEntityProvider, SecretBlock {
 
-    public PressurePlate(Settings settings) {
-        super(ActivationRule.EVERYTHING, settings);
+    public PressurePlate(Settings settings, BlockSetType blockSetType) {
+        super(ActivationRule.EVERYTHING, settings, blockSetType);
     }
 
     @Override
@@ -55,17 +52,6 @@ public class PressurePlate extends net.minecraft.block.PressurePlateBlock implem
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (!world.isClient) {
-            int i = this.getRedstoneOutput(state);
-            if (i == 0) {
-                this.updatePlateState(entity, world, pos, state, i);
-            }
-
-        }
-    }
-
-    @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
@@ -73,7 +59,7 @@ public class PressurePlate extends net.minecraft.block.PressurePlateBlock implem
     @Override
     @Environment(EnvType.CLIENT)
     public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-        return (stateFrom.getBlock() instanceof SecretBlock) ? true : super.isSideInvisible(state, stateFrom, direction);
+        return stateFrom.getBlock() instanceof SecretBlock || super.isSideInvisible(state, stateFrom, direction);
     }
 
     @Override

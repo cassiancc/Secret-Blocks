@@ -7,7 +7,7 @@ import net.calibermc.secretblocks.registry.ModBlocks;
 import net.calibermc.secretblocks.registry.ModEntities;
 import net.calibermc.secretblocks.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
@@ -18,8 +18,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -35,13 +37,20 @@ public class SecretBlocks implements ModInitializer {
 
 	public static final String MOD_ID = "secretblocks";
 	public static Identifier id(String id) { return new Identifier("secretblocks", id); }
+	public static RegistryWrapper.Impl<Block> LOOKUP = BuiltinRegistries.createWrapperLookup().getWrapperOrThrow(RegistryKeys.BLOCK);
 
 
 	// CREATIVE INVENTORY TAB GROUP
-	public static final ItemGroup SECRET_BLOCKS_GROUP = FabricItemGroupBuilder.create(id("secret_blocks")).icon(() -> new ItemStack(ModItems.CAMOUFLAGE_PASTE)).build();
+	public static final ItemGroup SECRET_BLOCKS_GROUP = FabricItemGroup.builder().displayName(Text.translatable("itemGroup.secretblocks.secret_blocks")).icon(() -> new ItemStack(ModItems.CAMOUFLAGE_PASTE)).entries(((displayContext, entries) -> {
+		ModBlocks.BLOCKS.forEach(entries::add);
+		ModItems.ITEMS.forEach(entries::add);
+
+	})).build();
 
 	@Override
 	public void onInitialize() {
+
+		Registry.register(Registries.ITEM_GROUP, id("secret_blocks"), SECRET_BLOCKS_GROUP);
 
 		ModBlocks.registerBlocks();
 		ModItems.registerItems();
@@ -51,13 +60,10 @@ public class SecretBlocks implements ModInitializer {
 			BlockPos pos = buf.readBlockPos();
 			BlockHitResult hit = buf.readBlockHitResult();
 			boolean glass = buf.readBoolean();
-			World world = player.world;
+			World world = player.getWorld();
 			Direction facing = player.getHorizontalFacing().getOpposite();
 			server.execute(() -> {
-
-				if (world.getBlockEntity(pos) instanceof SecretBlockEntity) {
-
-					SecretBlockEntity blockEntity = (SecretBlockEntity) world.getBlockEntity(pos);
+				if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
 
 					if (hit.getType() != HitResult.Type.MISS) {
 
@@ -66,9 +72,8 @@ public class SecretBlocks implements ModInitializer {
 						Block block = blockState.getBlock();
 
 						if (block instanceof SecretBlock) {
-							if (world.getBlockEntity(blockPos) instanceof SecretBlockEntity) {
-								SecretBlockEntity blockEntityAdjacent = (SecretBlockEntity) world.getBlockEntity(blockPos);
-								for (Direction dir : Direction.values()) {
+							if (world.getBlockEntity(blockPos) instanceof SecretBlockEntity blockEntityAdjacent) {
+                                for (Direction dir : Direction.values()) {
 									if (glass) {
 										SecretBlocks.updateSide(facing != dir ? blockEntityAdjacent.getState(hit.getSide()) : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
 									} else {

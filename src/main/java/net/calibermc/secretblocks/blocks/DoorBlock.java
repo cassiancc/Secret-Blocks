@@ -7,6 +7,7 @@ import net.calibermc.secretblocks.SecretBlocksClient;
 import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -22,8 +23,8 @@ import net.minecraft.world.World;
 
 public class DoorBlock extends net.minecraft.block.DoorBlock implements BlockEntityProvider, SecretBlock {
 
-	public DoorBlock(Settings settings) {
-		super(settings);
+	public DoorBlock(Settings settings, BlockSetType blockSetType) {
+		super(settings, blockSetType);
 	}
 
 	@Override
@@ -43,8 +44,8 @@ public class DoorBlock extends net.minecraft.block.DoorBlock implements BlockEnt
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (world.getBlockEntity(pos) instanceof SecretBlockEntity) {
-			SecretBlockEntity blockEntity = (SecretBlockEntity) world.getBlockEntity(pos);
+		if (world.getBlockEntity(pos) instanceof SecretBlockEntity secretBlockEntity) {
+			world.getBlockEntity(pos);
 		}
 		return super.onUse(state, world, pos, player, hand, hit);
 	}
@@ -57,7 +58,7 @@ public class DoorBlock extends net.minecraft.block.DoorBlock implements BlockEnt
 	@Override
 	@Environment(EnvType.CLIENT)
 	public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-		return (stateFrom.getBlock() instanceof SecretBlock) ? true : super.isSideInvisible(state, stateFrom, direction);
+		return stateFrom.getBlock() instanceof SecretBlock || super.isSideInvisible(state, stateFrom, direction);
 	}
 
 }

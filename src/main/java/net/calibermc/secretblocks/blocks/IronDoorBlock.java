@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -22,8 +23,8 @@ import net.minecraft.world.World;
 
 public class IronDoorBlock extends net.minecraft.block.DoorBlock implements BlockEntityProvider, SecretBlock {
 
-	public IronDoorBlock(Settings settings) {
-		super(settings);
+	public IronDoorBlock(Settings settings, BlockSetType blockSetType) {
+		super(settings, blockSetType);
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class IronDoorBlock extends net.minecraft.block.DoorBlock implements Bloc
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.getBlockEntity(pos) instanceof SecretBlockEntity) {
-			SecretBlockEntity blockEntity = (SecretBlockEntity) world.getBlockEntity(pos);
+			world.getBlockEntity(pos);
 		}
 		return super.onUse(state, world, pos, player, hand, hit);
 	}

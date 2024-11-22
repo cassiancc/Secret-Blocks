@@ -64,7 +64,7 @@ public class SecretBlockBakedModel implements FabricBakedModel, BakedModel {
 
 	@Override
 	public ModelTransformation getTransformation() {
-		return MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier("minecraft:block/block")).getTransformation();
+		return MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier("minecraft","block/block", "")).getTransformation();
 	}
 
 	@Override

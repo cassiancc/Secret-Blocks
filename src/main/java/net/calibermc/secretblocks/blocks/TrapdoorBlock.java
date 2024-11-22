@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.calibermc.secretblocks.blocks.entity.SecretBlockEntity;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -22,8 +23,8 @@ import net.minecraft.world.World;
 
 public class TrapdoorBlock extends net.minecraft.block.TrapdoorBlock implements BlockEntityProvider, SecretBlock {
 
-	public TrapdoorBlock(Settings settings) {
-		super(settings);
+	public TrapdoorBlock(Settings settings, BlockSetType blockSetType) {
+		super(settings, blockSetType);
 	}
 
 	@Override
