@@ -91,36 +91,29 @@ public class SecretBlocks implements ModInitializer {
 		}
 	}
 
-	public static void hitSet(World world, BlockPos pos, BlockPos hitPos, boolean glass, Direction facing, Direction side) {
-		System.out.println(pos.toString() + (world.getBlockEntity(pos) instanceof SecretBlockEntity));
+	public static void hitSet(World world, BlockPos pos, BlockPos hitPos) {
 		if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
-            BlockState blockState = world.getBlockState(hitPos);
-            Block block = blockState.getBlock();
+			hitSet(world, pos, hitPos, false, Direction.DOWN, Direction.DOWN, blockEntity);
+		}
+	}
 
-            if (block instanceof SecretBlock) {
-                if (world.getBlockEntity(hitPos) instanceof SecretBlockEntity blockEntityAdjacent) {
-                    for (Direction dir : Direction.values()) {
-                        if (glass) {
-                            SecretBlocks.updateSide(facing != dir ? blockEntityAdjacent.getState(side) : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-                        } else {
-                            SecretBlocks.updateSide(blockEntityAdjacent.getState(side), dir, pos, blockEntity);
-                        }
-                    }
-                } else {
-                    for (Direction dir : Direction.values()) {
-                        if (glass) {
-                            SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
-                        } else {
-                            SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
-                        }
-                    }
-                }
-            } else if (block != Blocks.AIR && blockState.isFullCube(world, hitPos)) {
+	public static void hitSet(World world, BlockPos pos, BlockPos hitPos, boolean glass, Direction facing, Direction side) {
+		if (world.getBlockEntity(pos) instanceof SecretBlockEntity blockEntity) {
+			hitSet(world, pos, hitPos, glass, facing, side, blockEntity);
+		}
+	}
+
+	public static void hitSet(World world, BlockPos pos, BlockPos hitPos, boolean glass, Direction facing, Direction side, SecretBlockEntity blockEntity) {
+        BlockState blockState = world.getBlockState(hitPos);
+        Block block = blockState.getBlock();
+
+        if (block instanceof SecretBlock) {
+            if (world.getBlockEntity(hitPos) instanceof SecretBlockEntity blockEntityAdjacent) {
                 for (Direction dir : Direction.values()) {
                     if (glass) {
-                        SecretBlocks.updateSide(facing != dir ? blockState : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                        SecretBlocks.updateSide(facing != dir ? blockEntityAdjacent.getState(side) : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
                     } else {
-                        SecretBlocks.updateSide(blockState, dir, pos, blockEntity);
+                        SecretBlocks.updateSide(blockEntityAdjacent.getState(side), dir, pos, blockEntity);
                     }
                 }
             } else {
@@ -132,10 +125,26 @@ public class SecretBlocks implements ModInitializer {
                     }
                 }
             }
+        } else if (block != Blocks.AIR && blockState.isFullCube(world, hitPos)) {
+            for (Direction dir : Direction.values()) {
+                if (glass) {
+                    SecretBlocks.updateSide(facing != dir ? blockState : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                } else {
+                    SecretBlocks.updateSide(blockState, dir, pos, blockEntity);
+                }
+            }
+        } else {
+            for (Direction dir : Direction.values()) {
+                if (glass) {
+                    SecretBlocks.updateSide(facing != dir ? Blocks.STONE.getDefaultState() : Blocks.GLASS.getDefaultState(), dir, pos, blockEntity);
+                } else {
+                    SecretBlocks.updateSide(Blocks.STONE.getDefaultState(), dir, pos, blockEntity);
+                }
+            }
+        }
 
-            blockEntity.refresh();
-		}
-	}
+        blockEntity.refresh();
+    }
 
 	public static void updateSide(BlockState state, Direction dir, BlockPos pos, SecretBlockEntity entity) {
 		if (!entity.getWorld().isClient) {

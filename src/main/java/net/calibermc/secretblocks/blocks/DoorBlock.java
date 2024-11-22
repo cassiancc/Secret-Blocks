@@ -39,7 +39,7 @@ public class DoorBlock extends net.minecraft.block.DoorBlock implements BlockEnt
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.getBlockEntity(pos) instanceof SecretBlockEntity secretBlockEntity) {
-			world.getBlockEntity(pos);
+			SecretBlocks.hitSet(world, pos, pos.down(), false, Direction.DOWN, Direction.DOWN, secretBlockEntity);
 		}
 		return super.onUse(state, world, pos, player, hand, hit);
 	}
