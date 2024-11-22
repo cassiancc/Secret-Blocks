@@ -30,8 +30,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.BuiltinRegistries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -300,29 +298,14 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public BlockState getState(Direction dir) {
-		BlockState tempState;
-		switch (dir) {
-			case DOWN:
-				tempState = downState;
-				break;
-			case NORTH:
-				tempState = northState;
-				break;
-			case EAST:
-				tempState = eastState;
-				break;
-			case SOUTH:
-				tempState = southState;
-				break;
-			case WEST:
-				tempState = westState;
-				break;
-			case UP:
-			default:
-				tempState = upState;
-				break;
-		}
-		return tempState;
+        return switch (dir) {
+			case DOWN -> downState;
+			case NORTH -> northState;
+			case EAST -> eastState;
+			case SOUTH -> southState;
+			case WEST -> westState;
+			default -> upState;
+			};
 	}
 
 	public static BlockState getState(Direction dir, NbtCompound tag) {
@@ -365,55 +348,25 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public Direction getDir(Direction dir) {
-		Direction tempDir;
-		switch (dir) {
-			case DOWN:
-				tempDir = downDirection;
-				break;
-			case NORTH:
-				tempDir = northDirection;
-				break;
-			case EAST:
-				tempDir = eastDirection;
-				break;
-			case SOUTH:
-				tempDir = southDirection;
-				break;
-			case WEST:
-				tempDir = westDirection;
-				break;
-			case UP:
-			default:
-				tempDir = upDirection;
-				break;
-		}
-		return tempDir;
+        return switch (dir) {
+			case DOWN -> downDirection;
+			case NORTH -> northDirection;
+			case EAST -> eastDirection;
+			case SOUTH -> southDirection;
+			case WEST -> westDirection;
+			default -> upDirection;
+		};
 	}
 
 	public static Direction getDir(Direction dir, NbtCompound tag) {
-		Direction tempDir;
-		switch (dir) {
-			case DOWN:
-				tempDir = byName(tag.getString("downDirection"));
-				break;
-			case NORTH:
-				tempDir = byName(tag.getString("northDirection"));
-				break;
-			case EAST:
-				tempDir = byName(tag.getString("eastDirection"));
-				break;
-			case SOUTH:
-				tempDir = byName(tag.getString("southDirection"));
-				break;
-			case WEST:
-				tempDir = byName(tag.getString("westDirection"));
-				break;
-			case UP:
-			default:
-				tempDir = byName(tag.getString("upDirection"));
-				break;
-		}
-		return tempDir;
+        return switch (dir) {
+			case DOWN -> byName(tag.getString("downDirection"));
+			case NORTH -> byName(tag.getString("northDirection"));
+			case EAST -> byName(tag.getString("eastDirection"));
+			case SOUTH -> byName(tag.getString("southDirection"));
+			case WEST -> byName(tag.getString("westDirection"));
+			default -> byName(tag.getString("upDirection"));
+			};
 	}
 
 	public void setRotation(Direction dir, int rotation) {
@@ -453,31 +406,14 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public int getRotation(Direction dir) {
-		int tempInt;
-		switch (dir) {
-			case UP:
-				tempInt = upRotation;
-				break;
-			case DOWN:
-				tempInt = downRotation;
-				break;
-			case NORTH:
-				tempInt = northRotation;
-				break;
-			case EAST:
-				tempInt = eastRotation;
-				break;
-			case SOUTH:
-				tempInt = southRotation;
-				break;
-			case WEST:
-				tempInt = westRotation;
-				break;
-			default:
-				tempInt = upRotation;
-				break;
-		}
-		return tempInt;
+        return switch (dir) {
+			case UP -> upRotation;
+			case DOWN -> downRotation;
+			case NORTH -> northRotation;
+			case EAST -> eastRotation;
+			case SOUTH -> southRotation;
+			case WEST -> westRotation;
+			};
 	}
 
 	@Override
@@ -490,29 +426,14 @@ public class SecretBlockEntity extends BlockEntity implements NamedScreenHandler
 	}
 
 	public static int getRotation(Direction dir, NbtCompound tag) {
-		int tempInt;
-		switch (dir) {
-			case DOWN:
-				tempInt = tag.getInt("downRotation");
-				break;
-			case NORTH:
-				tempInt = tag.getInt("northRotation");
-				break;
-			case EAST:
-				tempInt = tag.getInt("eastRotation");
-				break;
-			case SOUTH:
-				tempInt = tag.getInt("southRotation");
-				break;
-			case WEST:
-				tempInt = tag.getInt("westRotation");
-				break;
-			case UP:
-			default:
-				tempInt = tag.getInt("upRotation");
-				break;
-		}
-		return tempInt;
+        return switch (dir) {
+			case DOWN -> tag.getInt("downRotation");
+			case NORTH -> tag.getInt("northRotation");
+			case EAST -> tag.getInt("eastRotation");
+			case SOUTH -> tag.getInt("southRotation");
+			case WEST -> tag.getInt("westRotation");
+			default -> tag.getInt("upRotation");
+		};
 	}
 
 	@Environment(EnvType.CLIENT)
